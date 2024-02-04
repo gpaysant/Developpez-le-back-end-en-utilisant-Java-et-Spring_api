@@ -43,6 +43,7 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests(auth ->
                         auth
                         .requestMatchers("/auth/register").permitAll()
+                                .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(withDefaults())
