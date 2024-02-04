@@ -1,5 +1,6 @@
 package com.openclassrooms.api.exceptions;
 
+import com.openclassrooms.api.responses.MyResponseExceptionObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -15,8 +16,9 @@ public class ValidationExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<?> handleValidationExceptions() {
         Map<String, String> emptyMap = new HashMap<String, String>();
         return ResponseEntity.badRequest().body(emptyMap);
     }
+
 }
