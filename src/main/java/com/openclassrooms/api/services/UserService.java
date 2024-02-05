@@ -14,4 +14,6 @@ public interface UserService {
     String authenticateUser(UserDto userDto);
 
     UserDto getUserFromToken(String token);
+
+    UserDto getUser(int id);
 }

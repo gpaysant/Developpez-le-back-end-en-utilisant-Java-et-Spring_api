@@ -1,6 +1,7 @@
 package com.openclassrooms.api.services;
 
 import com.openclassrooms.api.dto.UserDto;
+import com.openclassrooms.api.exceptions.UnauthorizedEmptyException;
 import com.openclassrooms.api.exceptions.UnauthorizedException;
 import com.openclassrooms.api.models.User;
 import com.openclassrooms.api.repository.UserRepository;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Optional;
 
 @Data
 @Service
@@ -66,6 +68,15 @@ public class UserServiceImpl implements UserService {
         String email = jwtService.getSubject(token);
         User user = userRepository.findByEmail(email);
         return convertToDto(user);
+    }
+
+    @Override
+    public UserDto getUser(int id) {
+        Optional<User> optionalUser = userRepository.findById((long) id);
+        if (optionalUser.isPresent()) {
+            return convertToDto(optionalUser.get());
+        }
+        throw new UnauthorizedEmptyException();
     }
 
     private User convertToEntity(UserDto userDto) throws ParseException {

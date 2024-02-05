@@ -65,4 +65,16 @@ public class UserController {
         return ResponseEntity.ok(userDto);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getUserInformation(@PathVariable("id") final int id) {
+        UserDto userDto = userService.getUser(id);
+        return ResponseEntity.ok(userDto);
+    }
+
 }
