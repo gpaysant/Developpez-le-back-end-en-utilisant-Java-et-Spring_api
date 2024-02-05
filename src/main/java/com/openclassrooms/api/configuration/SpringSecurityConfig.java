@@ -1,8 +1,6 @@
 package com.openclassrooms.api.configuration;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
-import org.modelmapper.ModelMapper;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,7 +20,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 public class SpringSecurityConfig {
-
     private String jwtKey = "iN6E8MYLaUAhULZWmLTF0usjJk7MKBZv";
     @Bean
     public JwtDecoder jwtDecoder() {
@@ -43,10 +40,9 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests(auth ->
                         auth
                         .requestMatchers("/auth/register").permitAll()
-                                .requestMatchers("/auth/login").permitAll()
+                        .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
-                .httpBasic(withDefaults())
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(withDefaults()))
                 .build();
     }

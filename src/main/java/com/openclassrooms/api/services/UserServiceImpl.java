@@ -5,13 +5,11 @@ import com.openclassrooms.api.exceptions.UnauthorizedException;
 import com.openclassrooms.api.models.User;
 import com.openclassrooms.api.repository.UserRepository;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
 
@@ -50,21 +48,44 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String authenticateUser(UserDto userDto) throws UnauthorizedException {
+    public String authenticateUser(UserDto userDto) {
         String passwordNotEncoded = userDto.getPassword();
         User user = userRepository.findByEmail(userDto.getEmail());
         if (user != null) {
             if (this.bCryptPasswordEncoder.matches(passwordNotEncoded, user.getPassword())) {
-                String token = jwtService.generateToken(user.getEmail());
-                return token;
+                return jwtService.generateToken(user.getEmail());
             }
             throw new UnauthorizedException("Login or/and password are not correct");
         }
         throw new UnauthorizedException("this user doesn't exist");
     }
 
+    @Override
+    public UserDto getUserFromToken(String bearerToken) {
+        String token = getValueFromBearerToken(bearerToken);
+        String email = jwtService.getSubject(token);
+        User user = userRepository.findByEmail(email);
+        return convertToDto(user);
+    }
+
     private User convertToEntity(UserDto userDto) throws ParseException {
         User user = this.modelMapper.map(userDto, User.class);
         return user;
     }
+
+   private UserDto convertToDto(User user) {
+        UserDto userDto = modelMapper.map(user, UserDto.class);
+        return userDto;
+    }
+
+    private String getValueFromBearerToken(String tokenBearer) {
+        String[] tokenInformations = tokenBearer.split("\s");
+        boolean isBearerToken = tokenInformations[0].equals("Bearer");
+        String valueBearerToken = tokenInformations[1];
+        if (isBearerToken && !valueBearerToken.isEmpty()) {
+            return valueBearerToken;
+        }
+        throw new UnauthorizedException("Incorrect Bearer Token");
+    }
+
 }
