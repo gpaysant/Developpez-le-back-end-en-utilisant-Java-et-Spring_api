@@ -16,4 +16,8 @@ public interface ValidationGroups {
 
     }
 
+    interface AuthenticateWithToken extends Default {
+
+    }
+
 }

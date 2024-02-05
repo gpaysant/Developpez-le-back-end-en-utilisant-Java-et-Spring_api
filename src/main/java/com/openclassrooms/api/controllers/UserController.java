@@ -11,9 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 
@@ -48,11 +46,23 @@ public class UserController {
                             schema = @Schema(implementation = MyResponseExceptionObject.class)))
     })
     @PostMapping("/auth/login")
-    public ResponseEntity<?> authenticateUser(@Validated(Authenticate.class) @RequestBody UserDto userDto) throws Exception {
+    public ResponseEntity<?> authenticateUser(@Validated(Authenticate.class) @RequestBody UserDto userDto) {
         String token = userService.authenticateUser(userDto);
         MyResponseObject responseObject = new MyResponseObject();
         responseObject.setToken(token);
         return ResponseEntity.ok(responseObject);
+    }
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @GetMapping("/auth/me")
+    public ResponseEntity<?> authenticateUserWithToken(@RequestHeader("Authorization") String bearerToken) {
+        UserDto userDto = userService.getUserFromToken(bearerToken);
+        return ResponseEntity.ok(userDto);
     }
 
 }

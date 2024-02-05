@@ -1,7 +1,8 @@
 package com.openclassrooms.api.dto;
 
-import static com.openclassrooms.api.validators.ValidationGroups.Create;
-import static com.openclassrooms.api.validators.ValidationGroups.Authenticate;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.openclassrooms.api.validators.ValidationGroups.*;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -23,6 +24,7 @@ public class UserDto {
     private String email;
     @NotNull(groups = {Create.class, Authenticate.class})
     @Schema(description = "User password", example = "*****")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     @Schema(description = "Date user created")
     private Date created_at;
