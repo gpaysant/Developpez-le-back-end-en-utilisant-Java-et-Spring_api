@@ -14,4 +14,6 @@ public interface RentalService {
     List<RentalDto> getRentals();
 
     RentalDto getRental(int id);
+
+    void updateRental(RentalDto rentalDto);
 }
