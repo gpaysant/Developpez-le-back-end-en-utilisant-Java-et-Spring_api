@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -58,6 +59,21 @@ public class RentalServiceImpl implements RentalService {
             RentalDto rentalDto = convertToDto(rentalFound);
             rentalDto.setOwner_id(rentalFound.getUser().getId());
             return  rentalDto;
+        }
+        throw new UnauthorizedEmptyException();
+    }
+
+    @Override
+    public void updateRental(RentalDto rentalDto) {
+        Optional<Rental> rentalOpt = rentalRepository.findById(rentalDto.getId());
+        if (rentalOpt.isPresent()) {
+            Rental rental = rentalOpt.get();
+            rental.setName(rentalDto.getName());
+            rental.setSurface(rentalDto.getSurface());
+            rental.setPrice(rentalDto.getPrice());
+            rental.setDescription(rentalDto.getDescription());
+            rental.setUpdated_at(java.sql.Date.valueOf(LocalDate.now()));
+            rentalRepository.save(rental);
         }
         throw new UnauthorizedEmptyException();
     }

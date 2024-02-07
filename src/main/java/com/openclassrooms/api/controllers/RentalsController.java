@@ -69,4 +69,19 @@ public class RentalsController {
         return ResponseEntity.ok(rentalDto);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MyResponseMessageObject.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @PutMapping("/rentals/{id}")
+    public ResponseEntity<?> updateRental(@PathVariable("id") final int id, @Valid @RequestBody RentalDto rentalDto) throws ParseException {
+        rentalDto.setId((long)id);
+        rentalService.updateRental(rentalDto);
+        MyResponseMessageObject myResponseMessageObject = new MyResponseMessageObject();
+        myResponseMessageObject.setMessage("Rental updated !");
+        return ResponseEntity.ok(myResponseMessageObject);
+    }
+
 }
