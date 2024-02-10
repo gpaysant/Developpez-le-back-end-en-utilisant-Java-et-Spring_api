@@ -28,9 +28,9 @@ public class UserDto {
     private String password;
     @JsonFormat(pattern="yyyy/MM/dd")
     @Schema(description = "Date user created")
-    private Date created_at;
+    private Date createDate;
     @JsonFormat(pattern="yyyy/MM/dd")
     @Schema(description = "Date user updated")
-    private Date updated_at;
+    private Date updateDate;
 
 }

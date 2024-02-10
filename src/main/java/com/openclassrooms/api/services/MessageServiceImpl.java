@@ -42,8 +42,8 @@ public class MessageServiceImpl implements MessageService {
         UserDto userDto = userService.getUser(inputMessageDto.getUser_id());
         messageDto.setUserDto(userDto);
         messageDto.setMessage(inputMessageDto.getMessage());
-        messageDto.setCreated_at(Date.from(Instant.now()));
-        messageDto.setUpdated_at(Date.from(Instant.now()));
+        messageDto.setCreateDate(Date.from(Instant.now()));
+        messageDto.setUpdateDate(Date.from(Instant.now()));
         return messageDto;
     }
 

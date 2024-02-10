@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 
+
 @Data
 public class InputRentalDto {
     private Long id;
@@ -19,6 +20,6 @@ public class InputRentalDto {
     private UserDto userDto;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long owner_id;
-    private Date created_at;
-    private Date updated_at;
+    private Date createDate;
+    private Date updateDate;
 }

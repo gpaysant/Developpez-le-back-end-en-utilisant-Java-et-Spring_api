@@ -21,6 +21,8 @@ public class Message {
     @JoinColumn(name = "user_id")
     private User user;
     private String message;
-    private Date created_at;
-    private Date updated_at;
+    @Column(name = "created_at")
+    private Date createDate;
+    @Column(name = "updated_at")
+    private Date updateDate;
 }

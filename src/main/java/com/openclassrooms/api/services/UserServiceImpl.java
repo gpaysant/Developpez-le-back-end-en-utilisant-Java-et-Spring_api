@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User saveUser(UserDto userDto) throws ParseException {
-        userDto.setUpdated_at(Date.from(Instant.now()));
+        userDto.setUpdateDate(Date.from(Instant.now()));
         String passwordEncoded = this.bCryptPasswordEncoder.encode(userDto.getPassword());
         User user =  this.modelMapper.map(userDto, User.class);
         user.setPassword(passwordEncoded);
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String createNewUser(UserDto userDto) throws ParseException {
-        userDto.setCreated_at(Date.from(Instant.now())); // TODO : convention de nommage
+        userDto.setCreateDate(Date.from(Instant.now()));
         User userSaved = saveUser(userDto);
         return jwtService.generateToken(userSaved.getEmail());
     }

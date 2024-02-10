@@ -22,8 +22,8 @@ public class RentalDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long owner_id;
     @JsonFormat(pattern="yyyy/MM/dd")
-    private Date created_at;
+    private Date createDate;
     @JsonFormat(pattern="yyyy/MM/dd")
-    private Date updated_at;
+    private Date updateDate;
 
 }

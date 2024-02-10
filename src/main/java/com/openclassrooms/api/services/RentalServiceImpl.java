@@ -26,13 +26,13 @@ public class RentalServiceImpl implements RentalService {
     }
     @Override
     public void createNewRental(RentalDto rentalDto) throws ParseException {
-        rentalDto.setCreated_at(Date.from(Instant.now()));
+        rentalDto.setCreateDate(Date.from(Instant.now()));
         saveRental(rentalDto);
     }
 
     @Override
     public Rental saveRental(RentalDto rentalDto) {
-        rentalDto.setUpdated_at(Date.from(Instant.now()));
+        rentalDto.setUpdateDate(Date.from(Instant.now()));
         Rental rental = this.modelMapper.map(rentalDto, Rental.class);
         return rentalRepository.save(rental);
     }
@@ -68,7 +68,7 @@ public class RentalServiceImpl implements RentalService {
                 rental.setSurface(rentalDto.getSurface());
                 rental.setPrice(rentalDto.getPrice());
                 rental.setDescription(rentalDto.getDescription());
-                rental.setUpdated_at(java.sql.Date.valueOf(LocalDate.now()));
+                rental.setUpdateDate(java.sql.Date.valueOf(LocalDate.now()));
                 rentalRepository.save(rental);
             });
     }

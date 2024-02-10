@@ -15,6 +15,6 @@ public class MessageDto {
     @JsonIgnore
     private UserDto userDto;
     private String message;
-    private Date created_at;
-    private Date updated_at;
+    private Date createDate;
+    private Date updateDate;
 }

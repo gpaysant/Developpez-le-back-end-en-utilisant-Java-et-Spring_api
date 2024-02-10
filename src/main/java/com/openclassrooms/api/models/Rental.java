@@ -21,7 +21,9 @@ public class Rental {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private User user;
-    private Date created_at;
-    private Date updated_at;
+    @Column(name = "created_at")
+    private Date createDate;
+    @Column(name = "updated_at")
+    private Date updateDate;
 
 }
