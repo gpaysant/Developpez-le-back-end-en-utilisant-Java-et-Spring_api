@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RentalServiceImpl implements RentalService {
@@ -32,7 +31,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    public Rental saveRental(RentalDto rentalDto) throws ParseException {
+    public Rental saveRental(RentalDto rentalDto) {
         rentalDto.setUpdated_at(Date.from(Instant.now()));
         Rental rental = this.modelMapper.map(rentalDto, Rental.class);
         return rentalRepository.save(rental);

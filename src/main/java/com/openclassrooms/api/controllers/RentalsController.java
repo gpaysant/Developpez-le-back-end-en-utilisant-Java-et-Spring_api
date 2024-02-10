@@ -40,9 +40,7 @@ public class RentalsController {
         /*UserDto userDto = userService.getUserFromToken(bearerToken);
         rentalDto.setUserDto(userDto);
         rentalService.createNewRental(rentalDto);*/
-        MyResponseMessageObject responseObject = new MyResponseMessageObject();
-        responseObject.setMessage("Rental Created");
-        return ResponseEntity.ok(responseObject);
+        return ResponseEntity.ok(new MyResponseMessageObject("Rental Created"));
     }
 
     @ApiResponses(value = {
@@ -54,9 +52,7 @@ public class RentalsController {
     @GetMapping("/rentals")
     public ResponseEntity<?> getRentals() throws ParseException {
         List<RentalDto> rentals = rentalService.getRentals();
-        MyResponseRentalObject responseObject = new MyResponseRentalObject();
-        responseObject.setRentals(rentals);
-        return ResponseEntity.ok(responseObject);
+        return ResponseEntity.ok(new MyResponseRentalObject(rentals));
     }
 
     @ApiResponses(value = {
@@ -81,9 +77,7 @@ public class RentalsController {
     public ResponseEntity<?> updateRental(@PathVariable("id") final int id, @Valid @RequestBody RentalDto rentalDto) throws ParseException {
         rentalDto.setId((long)id);
         rentalService.updateRental(rentalDto);
-        MyResponseMessageObject myResponseMessageObject = new MyResponseMessageObject();
-        myResponseMessageObject.setMessage("Rental updated !");
-        return ResponseEntity.ok(myResponseMessageObject);
+        return ResponseEntity.ok(new MyResponseMessageObject("Rental updated !"));
     }
 
 }

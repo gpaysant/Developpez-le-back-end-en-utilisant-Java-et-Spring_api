@@ -39,8 +39,6 @@ public class MessageController {
             return new ResponseEntity<>(new HashMap<>(), HttpStatus.BAD_REQUEST);
         }
         messageService.createMessage(inputMessageDto);
-        MyResponseMessageObject myResponseMessageObject = new MyResponseMessageObject();
-        myResponseMessageObject.setMessage("Message send with success");
-        return ResponseEntity.ok(myResponseMessageObject);
+        return ResponseEntity.ok(new MyResponseMessageObject("Message send with success"));
     }
 }

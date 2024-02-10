@@ -41,10 +41,7 @@ public class UserController {
         if (isError || (token = userService.createNewUser(userDto)) == null) {
             return new ResponseEntity<>(new HashMap<>(), HttpStatus.BAD_REQUEST);
         }
-
-        MyResponseObject responseObject = new MyResponseObject();
-        responseObject.setToken(token);
-        return ResponseEntity.ok(responseObject);
+        return ResponseEntity.ok(new MyResponseObject(token));
     }
 
     @ApiResponses(value = {
@@ -62,9 +59,7 @@ public class UserController {
         if (isError || (token = userService.authenticateUser(userDto)) == null) {
             return new ResponseEntity<>(new MyResponseExceptionObject("error"), HttpStatus.UNAUTHORIZED);
         }
-        MyResponseObject responseObject = new MyResponseObject();
-        responseObject.setToken(token);
-        return ResponseEntity.ok(responseObject);
+        return ResponseEntity.ok(new MyResponseObject(token));
     }
 
     @ApiResponses(value = {
@@ -90,7 +85,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping("/user/{id}")
-    public ResponseEntity<?> getUserInformation(@PathVariable("id") final int id) throws UnauthorizedException {
+    public ResponseEntity<?> getUserInformation(@PathVariable("id") final int id) {
         try {
             UserDto userDto = userService.getUser(id);
             return ResponseEntity.ok(userDto);
