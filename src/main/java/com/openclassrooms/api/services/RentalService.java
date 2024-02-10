@@ -1,6 +1,7 @@
 package com.openclassrooms.api.services;
 
 import com.openclassrooms.api.dto.RentalDto;
+import com.openclassrooms.api.exceptions.UnauthorizedException;
 import com.openclassrooms.api.models.Rental;
 
 import java.text.ParseException;
@@ -13,7 +14,7 @@ public interface RentalService {
 
     List<RentalDto> getRentals();
 
-    RentalDto getRental(int id);
+    RentalDto getRental(int id) throws UnauthorizedException;
 
     void updateRental(RentalDto rentalDto);
 }

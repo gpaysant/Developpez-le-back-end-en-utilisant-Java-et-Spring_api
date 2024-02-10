@@ -1,7 +1,7 @@
 package com.openclassrooms.api.controllers;
 
 import com.openclassrooms.api.dto.RentalDto;
-import com.openclassrooms.api.dto.UserDto;
+import com.openclassrooms.api.exceptions.UnauthorizedException;
 import com.openclassrooms.api.responses.MyResponseMessageObject;
 import com.openclassrooms.api.responses.MyResponseRentalObject;
 import com.openclassrooms.api.services.RentalService;
@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
@@ -34,10 +35,11 @@ public class RentalsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PostMapping("/rentals")
-    public ResponseEntity<?> setRental(@RequestHeader("Authorization") String bearerToken, @Valid @RequestBody RentalDto rentalDto) throws ParseException {
-        UserDto userDto = userService.getUserFromToken(bearerToken);
+    public ResponseEntity<?> setRental(@RequestHeader("Authorization") String bearerToken, @ModelAttribute RentalDto rentalDto) throws ParseException, IOException {
+        //TODO : httpservletRequest en parametre
+        /*UserDto userDto = userService.getUserFromToken(bearerToken);
         rentalDto.setUserDto(userDto);
-        rentalService.createNewRental(rentalDto);
+        rentalService.createNewRental(rentalDto);*/
         MyResponseMessageObject responseObject = new MyResponseMessageObject();
         responseObject.setMessage("Rental Created");
         return ResponseEntity.ok(responseObject);
@@ -46,7 +48,7 @@ public class RentalsController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MyResponseMessageObject.class))),
+                            schema = @Schema(implementation = MyResponseRentalObject.class))),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping("/rentals")
@@ -64,7 +66,7 @@ public class RentalsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping("/rentals/{id}")
-    public ResponseEntity<?> getRental(@PathVariable("id") final int id) {
+    public ResponseEntity<?> getRental(@PathVariable("id") final int id) throws UnauthorizedException {
         RentalDto rentalDto = rentalService.getRental(id);
         return ResponseEntity.ok(rentalDto);
     }

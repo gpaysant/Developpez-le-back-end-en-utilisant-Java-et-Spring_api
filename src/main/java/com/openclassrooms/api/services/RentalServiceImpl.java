@@ -1,7 +1,7 @@
 package com.openclassrooms.api.services;
 
 import com.openclassrooms.api.dto.RentalDto;
-import com.openclassrooms.api.exceptions.UnauthorizedEmptyException;
+import com.openclassrooms.api.exceptions.UnauthorizedException;
 import com.openclassrooms.api.models.Rental;
 import com.openclassrooms.api.repository.RentalRepository;
 import org.modelmapper.ModelMapper;
@@ -34,16 +34,15 @@ public class RentalServiceImpl implements RentalService {
     @Override
     public Rental saveRental(RentalDto rentalDto) throws ParseException {
         rentalDto.setUpdated_at(Date.from(Instant.now()));
-        Rental rental = convertToEntity(rentalDto);
-        Rental saveRental = rentalRepository.save(rental);
-        return saveRental;
+        Rental rental = this.modelMapper.map(rentalDto, Rental.class);
+        return rentalRepository.save(rental);
     }
 
     @Override
     public List<RentalDto> getRentals() {
         List<RentalDto> rentals = new ArrayList<RentalDto>();
         rentalRepository.findAll().forEach(rental -> {
-            RentalDto rentalDto = convertToDto(rental);
+            RentalDto rentalDto = this.modelMapper.map(rental, RentalDto.class);
             rentalDto.setOwner_id(rental.getUser().getId());
             rentals.add(rentalDto);
 
@@ -52,39 +51,26 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    public RentalDto getRental(int id) {
-        Optional<Rental> rental = rentalRepository.findById((long)id);
-        if (rental.isPresent()) {
-            Rental rentalFound = rental.get();
-            RentalDto rentalDto = convertToDto(rentalFound);
-            rentalDto.setOwner_id(rentalFound.getUser().getId());
-            return  rentalDto;
-        }
-        throw new UnauthorizedEmptyException();
+    public RentalDto getRental(int id) throws UnauthorizedException {
+        return rentalRepository.findById((long)id).map(
+                rental -> {
+                    RentalDto rentalDto = this.modelMapper.map(rental, RentalDto.class);
+                    rentalDto.setOwner_id(rental.getUser().getId());
+                    return rentalDto;
+                }
+        ).orElseThrow(UnauthorizedException::new);
     }
 
     @Override
     public void updateRental(RentalDto rentalDto) {
-        Optional<Rental> rentalOpt = rentalRepository.findById(rentalDto.getId());
-        if (rentalOpt.isPresent()) {
-            Rental rental = rentalOpt.get();
-            rental.setName(rentalDto.getName());
-            rental.setSurface(rentalDto.getSurface());
-            rental.setPrice(rentalDto.getPrice());
-            rental.setDescription(rentalDto.getDescription());
-            rental.setUpdated_at(java.sql.Date.valueOf(LocalDate.now()));
-            rentalRepository.save(rental);
-        }
-        throw new UnauthorizedEmptyException();
-    }
-
-    private Rental convertToEntity(RentalDto rentalDto) throws ParseException {
-        Rental rental = this.modelMapper.map(rentalDto, Rental.class);
-        return rental;
-    }
-
-    private RentalDto convertToDto(Rental rental) {
-        RentalDto rentalDto = this.modelMapper.map(rental, RentalDto.class);
-        return rentalDto;
+        rentalRepository.findById(rentalDto.getId()).
+            ifPresent(rental -> {
+                rental.setName(rentalDto.getName());
+                rental.setSurface(rentalDto.getSurface());
+                rental.setPrice(rentalDto.getPrice());
+                rental.setDescription(rentalDto.getDescription());
+                rental.setUpdated_at(java.sql.Date.valueOf(LocalDate.now()));
+                rentalRepository.save(rental);
+            });
     }
 }
