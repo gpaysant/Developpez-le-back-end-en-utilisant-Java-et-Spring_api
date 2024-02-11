@@ -1,5 +1,6 @@
 package com.openclassrooms.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -20,6 +21,8 @@ public class InputRentalDto {
     private UserDto userDto;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long owner_id;
+    @JsonFormat(pattern="yyyy/MM/dd")
     private Date createDate;
+    @JsonFormat(pattern="yyyy/MM/dd")
     private Date updateDate;
 }

@@ -1,6 +1,8 @@
 package com.openclassrooms.api.controllers;
 
+import com.openclassrooms.api.dto.InputRentalDto;
 import com.openclassrooms.api.dto.RentalDto;
+import com.openclassrooms.api.dto.UserDto;
 import com.openclassrooms.api.exceptions.UnauthorizedException;
 import com.openclassrooms.api.responses.MyResponseMessageObject;
 import com.openclassrooms.api.responses.MyResponseRentalObject;
@@ -10,12 +12,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.text.ParseException;
 import java.util.List;
 
@@ -24,7 +28,6 @@ public class RentalsController {
 
     @Autowired
     RentalService rentalService;
-
     @Autowired
     private UserService userService;
 
@@ -35,11 +38,10 @@ public class RentalsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PostMapping("/rentals")
-    public ResponseEntity<?> setRental(@RequestHeader("Authorization") String bearerToken, @ModelAttribute RentalDto rentalDto) throws ParseException, IOException {
-        //TODO : httpservletRequest en parametre
-        /*UserDto userDto = userService.getUserFromToken(bearerToken);
-        rentalDto.setUserDto(userDto);
-        rentalService.createNewRental(rentalDto);*/
+    public ResponseEntity<?> setRental(Principal authentication, @ModelAttribute InputRentalDto inputRentalDto, HttpServletRequest httpServletRequest) throws ParseException, IOException, UnauthorizedException {
+        UserDto userDto = userService.getUserWithEmail(authentication.getName());
+        inputRentalDto.setUserDto(userDto);
+        rentalService.createNewRental(inputRentalDto, httpServletRequest);
         return ResponseEntity.ok(new MyResponseMessageObject("Rental Created"));
     }
 
