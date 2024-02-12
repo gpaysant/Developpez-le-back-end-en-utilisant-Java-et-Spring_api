@@ -1,4 +1,4 @@
-# Chatop
+# Chatop API
 This back-end application is an API which manages many routes. (GET/POST/PUT)
 
 This one provides informations such as users, rentals, messages.
