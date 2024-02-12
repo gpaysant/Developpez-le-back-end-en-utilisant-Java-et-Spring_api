@@ -1,7 +1,6 @@
 package com.openclassrooms.api.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.sql.Date;

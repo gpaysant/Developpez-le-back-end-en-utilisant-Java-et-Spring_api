@@ -30,6 +30,9 @@ public class FileServiceImpl implements FileService {
 
         String fileName = file.getOriginalFilename();
         Path destFilePath = pathDirectory.resolve(fileName);
+        if (Files.exists(destFilePath)) {
+            Files.delete(destFilePath);
+        }
         Files.copy(file.getInputStream(), destFilePath);
 
         // Build url from context of servlet
