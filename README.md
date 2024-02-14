@@ -22,7 +22,7 @@ https://dev.mysql.com/downloads/installer/
 4. Run script SQL 
   ```sh
   USE chatop;
-  SOURCE C:/{FOLDER_OF_APPLICATION_ANGULAR}/ressources/script.sql
+  SOURCE C:/[FOLDER_OF_APPLICATION_ANGULAR]/ressources/script.sql
   ```
 5. Configure informations for your database in applications.properties 
   ```sh
