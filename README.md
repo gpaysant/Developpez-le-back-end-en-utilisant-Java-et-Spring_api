@@ -24,6 +24,12 @@ https://dev.mysql.com/downloads/installer/
   USE chatop;
   SOURCE C:/{FOLDER_OF_APPLICATION_ANGULAR}/ressources/script.sql
   ```
+5. Configure informations for your database in applications.properties 
+  ```sh
+  spring.datasource.url=jdbc:mysql://localhost:3306/chatop
+  spring.datasource.username=[YOUR_USERNAME](by default root)
+  spring.datasource.password=[YOUR_PASSWORD]
+  ```
 
 ## Install the project
 
