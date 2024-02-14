@@ -22,7 +22,9 @@ public class InputRentalDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long owner_id;
     @JsonFormat(pattern="yyyy/MM/dd")
+    @JsonProperty("created_at")
     private Date createDate;
     @JsonFormat(pattern="yyyy/MM/dd")
+    @JsonProperty("updated_at")
     private Date updateDate;
 }
