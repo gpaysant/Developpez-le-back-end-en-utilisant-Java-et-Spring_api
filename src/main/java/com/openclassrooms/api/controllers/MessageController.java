@@ -1,7 +1,7 @@
 package com.openclassrooms.api.controllers;
 
 import com.openclassrooms.api.dto.InputMessageDto;
-import com.openclassrooms.api.responses.MyResponseExceptionObject;
+import com.openclassrooms.api.exceptions.UnauthorizedException;
 import com.openclassrooms.api.responses.MyResponseMessageObject;
 import com.openclassrooms.api.services.MessageService;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import org.modelmapper.internal.bytebuddy.implementation.HashCodeMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.ParseException;
 import java.util.HashMap;
 
 @RestController
@@ -35,12 +33,15 @@ public class MessageController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PostMapping("/messages")
-    public ResponseEntity<?> writeMessage(@Valid @RequestBody InputMessageDto inputMessageDto, BindingResult bindingResult) throws ParseException {
-        if (bindingResult.hasErrors() || !messageService.createMessage(inputMessageDto)) {
+    public ResponseEntity<?> writeMessage(@Valid @RequestBody InputMessageDto inputMessageDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(new HashMap<>(), HttpStatus.BAD_REQUEST);
         }
-        MyResponseMessageObject myResponseMessageObject = new MyResponseMessageObject();
-        myResponseMessageObject.setMessage("Message send with success");
-        return ResponseEntity.ok(myResponseMessageObject);
+        try {
+            messageService.createMessage(inputMessageDto);
+        } catch (UnauthorizedException ex) {
+            return new ResponseEntity<>(new HashMap<>(), HttpStatus.UNAUTHORIZED);
+        }
+        return ResponseEntity.ok(new MyResponseMessageObject("Message send with success"));
     }
 }

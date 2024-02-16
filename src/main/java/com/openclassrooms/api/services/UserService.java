@@ -1,19 +1,20 @@
 package com.openclassrooms.api.services;
 
 import com.openclassrooms.api.dto.UserDto;
+import com.openclassrooms.api.exceptions.UnauthorizedException;
 import com.openclassrooms.api.models.User;
 
-import java.text.ParseException;
+import java.util.Optional;
 
 public interface UserService {
 
-    User saveUser(UserDto userDto) throws ParseException;
+    Optional<User> saveUser(UserDto userDto);
 
-    String createNewUser(UserDto userDto) throws ParseException;
+    String createNewUser(UserDto userDto);
 
     String authenticateUser(UserDto userDto);
 
-    UserDto getUserFromToken(String token);
+    UserDto getUser(int id) throws UnauthorizedException;
 
-    UserDto getUser(int id);
+    UserDto getUserWithEmail(String email) throws UnauthorizedException;
 }

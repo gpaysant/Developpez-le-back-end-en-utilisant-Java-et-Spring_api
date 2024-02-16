@@ -1,7 +1,6 @@
 package com.openclassrooms.api.services;
 
 import com.openclassrooms.api.dto.UserDto;
-import com.openclassrooms.api.exceptions.UnauthorizedEmptyException;
 import com.openclassrooms.api.exceptions.UnauthorizedException;
 import com.openclassrooms.api.models.User;
 import com.openclassrooms.api.repository.UserRepository;
@@ -10,7 +9,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
@@ -32,71 +30,47 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User saveUser(UserDto userDto) throws ParseException {
-        userDto.setUpdated_at(Date.from(Instant.now()));
+    public Optional<User> saveUser(UserDto userDto) {
+        userDto.setUpdateDate(Date.from(Instant.now()));
         String passwordEncoded = this.bCryptPasswordEncoder.encode(userDto.getPassword());
-        User user = convertToEntity(userDto);
+        User user =  this.modelMapper.map(userDto, User.class);
         user.setPassword(passwordEncoded);
-        User savedUser = userRepository.save(user);
-        return savedUser;
+        try {
+            return Optional.of(userRepository.save(user));
+        } catch (Exception ex) {
+            return Optional.empty();
+        }
     }
 
     @Override
-    public String createNewUser(UserDto userDto) throws ParseException {
-        userDto.setCreated_at(Date.from(Instant.now()));
-        User userSaved = saveUser(userDto);
-        String token = jwtService.generateToken(userSaved.getEmail());
-        return token;
+    public String createNewUser(UserDto userDto) {
+        userDto.setCreateDate(Date.from(Instant.now()));
+        Optional<User> userSaved = saveUser(userDto);
+        return userSaved.map(user -> jwtService.generateToken(user.getEmail())).orElse(null);
     }
 
     @Override
     public String authenticateUser(UserDto userDto) {
         String passwordNotEncoded = userDto.getPassword();
-        User user = userRepository.findByEmail(userDto.getEmail());
-        if (user != null) {
-            if (this.bCryptPasswordEncoder.matches(passwordNotEncoded, user.getPassword())) {
-                return jwtService.generateToken(user.getEmail());
-            }
-            throw new UnauthorizedException("Login or/and password are not correct");
+        Optional<User> user = userRepository.findByEmail(userDto.getEmail());
+        if (user.isEmpty() || !this.bCryptPasswordEncoder.matches(passwordNotEncoded, user.get().getPassword())) {
+            return null;
         }
-        throw new UnauthorizedException("this user doesn't exist");
+        return jwtService.generateToken(user.get().getEmail());
     }
 
     @Override
-    public UserDto getUserFromToken(String bearerToken) {
-        String token = getValueFromBearerToken(bearerToken);
-        String email = jwtService.getSubject(token);
-        User user = userRepository.findByEmail(email);
-        return convertToDto(user);
+    public UserDto getUser(int id) throws UnauthorizedException {
+        return userRepository.findById((long)id)
+                .map(user -> this.modelMapper.map(user, UserDto.class))
+                .orElseThrow(UnauthorizedException::new);
     }
 
     @Override
-    public UserDto getUser(int id) {
-        Optional<User> optionalUser = userRepository.findById((long) id);
-        if (optionalUser.isPresent()) {
-            return convertToDto(optionalUser.get());
-        }
-        throw new UnauthorizedEmptyException();
-    }
-
-    private User convertToEntity(UserDto userDto) throws ParseException {
-        User user = this.modelMapper.map(userDto, User.class);
-        return user;
-    }
-
-   private UserDto convertToDto(User user) {
-        UserDto userDto = modelMapper.map(user, UserDto.class);
-        return userDto;
-    }
-
-    private String getValueFromBearerToken(String tokenBearer) {
-        String[] tokenInformations = tokenBearer.split("\s");
-        boolean isBearerToken = tokenInformations[0].equals("Bearer");
-        String valueBearerToken = tokenInformations[1];
-        if (isBearerToken && !valueBearerToken.isEmpty()) {
-            return valueBearerToken;
-        }
-        throw new UnauthorizedException("Incorrect Bearer Token");
+    public UserDto getUserWithEmail(String email) throws UnauthorizedException {
+        return userRepository.findByEmail(email)
+                .map(user -> this.modelMapper.map(user, UserDto.class))
+                .orElseThrow(UnauthorizedException::new);
     }
 
 }

@@ -1,7 +1,7 @@
 package com.openclassrooms.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.Date;
@@ -15,6 +15,8 @@ public class MessageDto {
     @JsonIgnore
     private UserDto userDto;
     private String message;
-    private Date created_at;
-    private Date updated_at;
+    @JsonProperty("created_at")
+    private Date createDate;
+    @JsonProperty("updated_at")
+    private Date updateDate;
 }

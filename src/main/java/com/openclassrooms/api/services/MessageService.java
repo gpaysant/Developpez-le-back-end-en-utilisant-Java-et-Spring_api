@@ -1,9 +1,8 @@
 package com.openclassrooms.api.services;
 
 import com.openclassrooms.api.dto.InputMessageDto;
-
-import java.text.ParseException;
+import com.openclassrooms.api.exceptions.UnauthorizedException;
 
 public interface MessageService {
-    boolean createMessage(InputMessageDto inputMessageDto) throws ParseException;
+    void createMessage(InputMessageDto inputMessageDto) throws UnauthorizedException;
 }

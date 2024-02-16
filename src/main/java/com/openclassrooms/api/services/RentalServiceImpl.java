@@ -1,49 +1,53 @@
 package com.openclassrooms.api.services;
 
+import com.openclassrooms.api.dto.InputRentalDto;
 import com.openclassrooms.api.dto.RentalDto;
-import com.openclassrooms.api.exceptions.UnauthorizedEmptyException;
+import com.openclassrooms.api.exceptions.UnauthorizedException;
 import com.openclassrooms.api.models.Rental;
 import com.openclassrooms.api.repository.RentalRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
+import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RentalServiceImpl implements RentalService {
 
     private final RentalRepository rentalRepository;
+    private final FileService fileService;
     private final ModelMapper modelMapper;
 
-    public RentalServiceImpl(RentalRepository rentalRepository, ModelMapper modelMapper) {
+    public RentalServiceImpl(RentalRepository rentalRepository, FileService fileService, ModelMapper modelMapper) {
         this.rentalRepository = rentalRepository;
+        this.fileService = fileService;
         this.modelMapper = modelMapper;
     }
     @Override
-    public void createNewRental(RentalDto rentalDto) throws ParseException {
-        rentalDto.setCreated_at(Date.from(Instant.now()));
-        saveRental(rentalDto);
-    }
+    public void createNewRental(InputRentalDto inputRentalDto, HttpServletRequest httpServletRequest) throws IOException {
+        String urlImage = fileService.uploadFile(httpServletRequest, inputRentalDto.getPicture());
 
-    @Override
-    public Rental saveRental(RentalDto rentalDto) throws ParseException {
-        rentalDto.setUpdated_at(Date.from(Instant.now()));
-        Rental rental = convertToEntity(rentalDto);
-        Rental saveRental = rentalRepository.save(rental);
-        return saveRental;
+        inputRentalDto.setCreateDate(Date.from(Instant.now()));
+        inputRentalDto.setUpdateDate(Date.from(Instant.now()));
+        RentalDto rentalDto = this.modelMapper.map(inputRentalDto, RentalDto.class);
+        rentalDto.setPicture(urlImage);
+
+        Rental rental = this.modelMapper.map(rentalDto, Rental.class);
+        rental.setPicture(urlImage);
+
+        rentalRepository.save(rental);
     }
 
     @Override
     public List<RentalDto> getRentals() {
         List<RentalDto> rentals = new ArrayList<RentalDto>();
         rentalRepository.findAll().forEach(rental -> {
-            RentalDto rentalDto = convertToDto(rental);
+            RentalDto rentalDto = this.modelMapper.map(rental, RentalDto.class);
             rentalDto.setOwner_id(rental.getUser().getId());
             rentals.add(rentalDto);
 
@@ -52,39 +56,26 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    public RentalDto getRental(int id) {
-        Optional<Rental> rental = rentalRepository.findById((long)id);
-        if (rental.isPresent()) {
-            Rental rentalFound = rental.get();
-            RentalDto rentalDto = convertToDto(rentalFound);
-            rentalDto.setOwner_id(rentalFound.getUser().getId());
-            return  rentalDto;
-        }
-        throw new UnauthorizedEmptyException();
+    public RentalDto getRental(int id) throws UnauthorizedException {
+        return rentalRepository.findById((long)id).map(
+                rental -> {
+                    RentalDto rentalDto = this.modelMapper.map(rental, RentalDto.class);
+                    rentalDto.setOwner_id(rental.getUser().getId());
+                    return rentalDto;
+                }
+        ).orElseThrow(UnauthorizedException::new);
     }
 
     @Override
     public void updateRental(RentalDto rentalDto) {
-        Optional<Rental> rentalOpt = rentalRepository.findById(rentalDto.getId());
-        if (rentalOpt.isPresent()) {
-            Rental rental = rentalOpt.get();
-            rental.setName(rentalDto.getName());
-            rental.setSurface(rentalDto.getSurface());
-            rental.setPrice(rentalDto.getPrice());
-            rental.setDescription(rentalDto.getDescription());
-            rental.setUpdated_at(java.sql.Date.valueOf(LocalDate.now()));
-            rentalRepository.save(rental);
-        }
-        throw new UnauthorizedEmptyException();
-    }
-
-    private Rental convertToEntity(RentalDto rentalDto) throws ParseException {
-        Rental rental = this.modelMapper.map(rentalDto, Rental.class);
-        return rental;
-    }
-
-    private RentalDto convertToDto(Rental rental) {
-        RentalDto rentalDto = this.modelMapper.map(rental, RentalDto.class);
-        return rentalDto;
+        rentalRepository.findById(rentalDto.getId()).
+            ifPresent(rental -> {
+                rental.setName(rentalDto.getName());
+                rental.setSurface(rentalDto.getSurface());
+                rental.setPrice(rentalDto.getPrice());
+                rental.setDescription(rentalDto.getDescription());
+                rental.setUpdateDate(java.sql.Date.valueOf(LocalDate.now()));
+                rentalRepository.save(rental);
+            });
     }
 }

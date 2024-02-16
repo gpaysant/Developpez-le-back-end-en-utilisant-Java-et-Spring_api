@@ -1,19 +1,20 @@
 package com.openclassrooms.api.services;
 
+import com.openclassrooms.api.dto.InputRentalDto;
 import com.openclassrooms.api.dto.RentalDto;
-import com.openclassrooms.api.models.Rental;
+import com.openclassrooms.api.exceptions.UnauthorizedException;
+import jakarta.servlet.http.HttpServletRequest;
 
-import java.text.ParseException;
+import java.io.IOException;
 import java.util.List;
 
 public interface RentalService {
-    void createNewRental(RentalDto rentalDto) throws ParseException;
 
-    Rental saveRental(RentalDto rentalDto) throws ParseException;
+    void createNewRental(InputRentalDto inputRentalDto, HttpServletRequest httpServletRequest) throws IOException;
 
     List<RentalDto> getRentals();
 
-    RentalDto getRental(int id);
+    RentalDto getRental(int id) throws UnauthorizedException;
 
     void updateRental(RentalDto rentalDto);
 }

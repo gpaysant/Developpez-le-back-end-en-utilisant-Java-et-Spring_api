@@ -4,9 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.sql.Date;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -19,10 +16,8 @@ public class User {
     private String name;
     private String email;
     private String password;
-    private Date created_at;
-    private Date updated_at;
-
-    /*@OneToOne(mappedBy = "owner_id")
-    private Rental rental;*/
-
+    @Column(name = "created_at")
+    private Date createDate;
+    @Column(name = "updated_at")
+    private Date updateDate;
 }
