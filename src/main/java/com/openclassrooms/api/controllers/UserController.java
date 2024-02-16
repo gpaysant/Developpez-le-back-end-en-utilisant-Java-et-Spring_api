@@ -17,7 +17,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.text.ParseException;
 import java.util.HashMap;
 
 import static com.openclassrooms.api.validators.ValidationGroups.Authenticate;
@@ -35,12 +34,13 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
     @PostMapping("/auth/register")
-    public ResponseEntity<?> setUser(@Validated(Create.class) @RequestBody UserDto userDto, BindingResult bindingResult) throws ParseException {
+    public ResponseEntity<?> setUser(@Validated(Create.class) @RequestBody UserDto userDto, BindingResult bindingResult) {
         boolean isError = bindingResult.hasErrors();
         String token = null;
         if (isError || (token = userService.createNewUser(userDto)) == null) {
             return new ResponseEntity<>(new HashMap<>(), HttpStatus.BAD_REQUEST);
         }
+
         return ResponseEntity.ok(new MyResponseObject(token));
     }
 
@@ -53,7 +53,7 @@ public class UserController {
                             schema = @Schema(implementation = MyResponseExceptionObject.class)))
     })
     @PostMapping("/auth/login")
-    public ResponseEntity<?> authenticateUser(@Validated(Authenticate.class) @RequestBody UserDto userDto, BindingResult bindingResult) throws UnauthorizedException {
+    public ResponseEntity<?> authenticateUser(@Validated(Authenticate.class) @RequestBody UserDto userDto, BindingResult bindingResult) {
         boolean isError = bindingResult.hasErrors();
         String token = null;
         if (isError || (token = userService.authenticateUser(userDto)) == null) {

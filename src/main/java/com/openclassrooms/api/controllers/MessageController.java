@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.ParseException;
 import java.util.HashMap;
 
 @RestController
@@ -34,11 +33,15 @@ public class MessageController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PostMapping("/messages")
-    public ResponseEntity<?> writeMessage(@Valid @RequestBody InputMessageDto inputMessageDto, BindingResult bindingResult) throws ParseException, UnauthorizedException {
+    public ResponseEntity<?> writeMessage(@Valid @RequestBody InputMessageDto inputMessageDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(new HashMap<>(), HttpStatus.BAD_REQUEST);
         }
-        messageService.createMessage(inputMessageDto);
+        try {
+            messageService.createMessage(inputMessageDto);
+        } catch (UnauthorizedException ex) {
+            return new ResponseEntity<>(new HashMap<>(), HttpStatus.UNAUTHORIZED);
+        }
         return ResponseEntity.ok(new MyResponseMessageObject("Message send with success"));
     }
 }

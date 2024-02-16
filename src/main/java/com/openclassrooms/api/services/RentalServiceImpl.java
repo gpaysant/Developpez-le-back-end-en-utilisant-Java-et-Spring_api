@@ -10,7 +10,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ public class RentalServiceImpl implements RentalService {
         this.modelMapper = modelMapper;
     }
     @Override
-    public void createNewRental(InputRentalDto inputRentalDto, HttpServletRequest httpServletRequest) throws ParseException, IOException {
+    public void createNewRental(InputRentalDto inputRentalDto, HttpServletRequest httpServletRequest) throws IOException {
         String urlImage = fileService.uploadFile(httpServletRequest, inputRentalDto.getPicture());
 
         inputRentalDto.setCreateDate(Date.from(Instant.now()));

@@ -9,9 +9,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Optional;
 
 @Data
 @Service
@@ -30,31 +30,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User saveUser(UserDto userDto) throws ParseException {
+    public Optional<User> saveUser(UserDto userDto) {
         userDto.setUpdateDate(Date.from(Instant.now()));
         String passwordEncoded = this.bCryptPasswordEncoder.encode(userDto.getPassword());
         User user =  this.modelMapper.map(userDto, User.class);
         user.setPassword(passwordEncoded);
-        User savedUser = userRepository.save(user);
-        return savedUser;
-    }
-
-    @Override
-    public String createNewUser(UserDto userDto) throws ParseException {
-        userDto.setCreateDate(Date.from(Instant.now()));
-        User userSaved = saveUser(userDto);
-        return jwtService.generateToken(userSaved.getEmail());
-    }
-
-    @Override
-    public String authenticateUser(UserDto userDto) throws UnauthorizedException {
-        String passwordNotEncoded = userDto.getPassword();
-        User user = userRepository.findByEmail(userDto.getEmail())
-                .orElseThrow(UnauthorizedException::new);
-        if (this.bCryptPasswordEncoder.matches(passwordNotEncoded, user.getPassword())) {
-            return jwtService.generateToken(user.getEmail());
+        try {
+            return Optional.of(userRepository.save(user));
+        } catch (Exception ex) {
+            return Optional.empty();
         }
-        return null;
+    }
+
+    @Override
+    public String createNewUser(UserDto userDto) {
+        userDto.setCreateDate(Date.from(Instant.now()));
+        Optional<User> userSaved = saveUser(userDto);
+        return userSaved.map(user -> jwtService.generateToken(user.getEmail())).orElse(null);
+    }
+
+    @Override
+    public String authenticateUser(UserDto userDto) {
+        String passwordNotEncoded = userDto.getPassword();
+        Optional<User> user = userRepository.findByEmail(userDto.getEmail());
+        if (user.isEmpty() || !this.bCryptPasswordEncoder.matches(passwordNotEncoded, user.get().getPassword())) {
+            return null;
+        }
+        return jwtService.generateToken(user.get().getEmail());
     }
 
     @Override
